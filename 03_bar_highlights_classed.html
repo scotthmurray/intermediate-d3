@@ -6,6 +6,27 @@
 	<script type="text/javascript" src="d3.js"></script>
 	<style type="text/css">
 
+
+
+		body {
+			background-color: gray;
+		}
+
+		svg {
+			background-color: white;
+		}
+
+		/* Normal, non-highlighted bars are blue */
+		svg rect {
+			fill: SteelBlue;
+		}
+
+		/* New highlighting rule for rects 
+		   with class of "highlight" */
+		svg rect.highlight {
+			fill: DarkOrange;
+		}
+
 		.axis path,
 		.axis line {
 			fill: none;
@@ -18,28 +39,36 @@
 			font-size: 11px;
 		}
 
+
+
 	</style>
 </head>
 <body>
 	<script type="text/javascript">
 
-		//Width and height
+
+
+		//Width, height, padding
 		var w = 600;
 		var h = 250;
+		var padding = 25;
 		
+		//Array of dummy data values
 		var dataset = [ 5, 10, 13, 19, 21, 25, 22, 18, 15, 13,
 						11, 12, 15, 20, 18, 17, 16, 18, 23, 25 ];
 
+		//Configure x and y scale functions
 		var xScale = d3.scale.ordinal()
 						.domain(d3.range(dataset.length))
-						.rangeRoundBands([0, w], 0.05);
+						.rangeRoundBands([ padding, w - padding ], 0.05);
 
 		var yScale = d3.scale.linear()
-						.domain([0, d3.max(dataset)])
-						.range([0, h]);
+						.domain([ 0, d3.max(dataset) ])
+						.rangeRound([ h - padding, padding ]);
 
+		//Configure y axis generator
 		var yAxis = d3.svg.axis()
-						.scale(yAxis)
+						.scale(yScale)
 						.orient("left")
 						.ticks(5);
 		
@@ -54,24 +83,35 @@
 		   .data(dataset)
 		   .enter()
 		   .append("rect")
+		   .classed("highlight", function(d) {
+		   		//classed() applies a class if true is returned.
+		   		//
+		   		//So any rect with a value exceeding 20 will
+		   		//have the class of "highlight" applied.
+		   		if (d > 20) {
+		   			return true;
+		   		}
+		   		return false;
+		   })
 		   .attr("x", function(d, i) {
 		   		return xScale(i);
 		   })
 		   .attr("y", function(d) {
-		   		return h - yScale(d);
+		   		return yScale(d);
 		   })
 		   .attr("width", xScale.rangeBand())
 		   .attr("height", function(d) {
-		   		return yScale(d);
-		   })
-		   .attr("fill", "steelblue");
+		   		return h - padding - yScale(d);
+		   });
 
 		//Create y axis
 		svg.append("g")
 			.attr("class", "axis")
-			// .attr("transform", "translate(" + (padding - 5) + ",0)")
+			.attr("transform", "translate(" + padding + ",0)")
 			.call(yAxis);
-		
+
+
+
 	</script>
 </body>
 </html>

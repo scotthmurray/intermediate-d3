@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>D3: A flexible, scalable bar chart</title>
+	<script type="text/javascript" src="d3.js"></script>
+	<style type="text/css">
+
+
+
+		body {
+			background-color: gray;
+		}
+
+		svg {
+			background-color: white;
+		}
+
+		svg rect {
+			fill: SteelBlue;
+		}
+
+		svg rect.highlight {
+			fill: DarkOrange;
+		}
+
+		.axis path,
+		.axis line {
+			fill: none;
+			stroke: black;
+			shape-rendering: crispEdges;
+		}
+		
+		.axis text {
+			font-family: sans-serif;
+			font-size: 11px;
+		}
+
+
+
+	</style>
+</head>
+<body>
+	<script type="text/javascript">
+
+
+
+		//Width, height, padding
+		var w = 600;
+		var h = 250;
+		var padding = 25;
+		
+		//Array of dummy data values
+		var dataset = [ 5, 10, 13, 19, 21, 25, 22, 18, 15, 13,
+						11, 12, 15, 20, 18, 17, 16, 18, 23, 25 ];
+
+		//Configure x and y scale functions
+		var xScale = d3.scale.ordinal()
+						.domain(d3.range(dataset.length))
+						.rangeRoundBands([ padding, w - padding ], 0.05);
+
+		var yScale = d3.scale.linear()
+						.domain([ 0, d3.max(dataset) ])
+						.rangeRound([ h - padding, padding ]);
+
+		//Configure y axis generator
+		var yAxis = d3.svg.axis()
+						.scale(yScale)
+						.orient("left")
+						.ticks(5);
+		
+		//Create SVG element
+		var svg = d3.select("body")
+					.append("svg")
+					.attr("width", w)
+					.attr("height", h);
+
+		//Create bars
+		//…and store a reference to them in new variable 'rects',
+		//so we can reference them easily later, without having to
+		//retype d3.selectAll("rect")…
+		var rects = svg.selectAll("rect")
+					   .data(dataset)
+					   .enter()
+					   .append("rect")
+					   .attr("x", function(d, i) {
+					   		return xScale(i);
+					   })
+					   .attr("y", function(d) {
+					   		return yScale(d);
+					   })
+					   .attr("width", xScale.rangeBand())
+					   .attr("height", function(d) {
+					   		return h - padding - yScale(d);
+					   });
+
+		//Instead of using classed() when we first create the bars,
+		//we can reselect the bars later (e.g. d3.selectAll("rect")…)
+		//or just use the reference we already stored in 'rects':
+		rects.classed("highlight", function(d) {
+		   		if (d > 20) {
+		   			return true;
+		   		}
+		   		return false;
+			});
+
+		//We can use filter() to accomplish the same thing, but by
+		//filtering a selection (excluding elements) rather than
+		//applying conditional logic to every element.
+		//
+		//This has the same outcome as the code above, but each
+		//approach is useful in different situations.
+		//
+		//Don't believe me? Try commenting out each of these sections
+		//and experimenting.
+		rects.filter(function(d) {
+				if (d > 20) {
+		   			return true;  //Element will be included in selection
+		   		}
+		   		return false;	  //Element will be excluded from selection
+			})
+			.attr("class", "highlight");
+
+		//Create y axis
+		svg.append("g")
+			.attr("class", "axis")
+			.attr("transform", "translate(" + padding + ",0)")
+			.call(yAxis);
+
+
+
+	</script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>D3: A flexible, scalable bar chart</title>
+	<script type="text/javascript" src="d3.js"></script>
+	<style type="text/css">
+
+
+
+		body {
+			background-color: gray;
+		}
+
+		svg {
+			background-color: white;
+		}
+
+		.axis path,
+		.axis line {
+			fill: none;
+			stroke: black;
+			shape-rendering: crispEdges;
+		}
+		
+		.axis text {
+			font-family: sans-serif;
+			font-size: 11px;
+		}
+
+
+
+	</style>
+</head>
+<body>
+	<script type="text/javascript">
+
+
+
+		//Width, height, padding
+		var w = 600;
+		var h = 250;
+		var padding = 25;
+		
+		//Array of dummy data values (simple!)
+		var dataset = [ 5, 10, 13, 19, 21, 25, 22, 18, 15, 13,
+						11, 12, 15, 20, 18, 17, 16, 18, 23, 25 ];
+
+		//Configure x and y scale functions
+		//Note each scale accounts for padding
+		var xScale = d3.scale.ordinal()
+						.domain(d3.range(dataset.length))
+						.rangeRoundBands([ padding, w - padding ], 0.05);
+
+		//Note y scale inverts values, so larger inputs return smaller
+		//outputs.  That's because we want the y value for the "top" 
+		//of each bar.  You could flip the two range values to take
+		//the opposite approach.
+		var yScale = d3.scale.linear()
+						.domain([ 0, d3.max(dataset) ])
+						.rangeRound([ h - padding, padding ]);
+
+		//Configure y axis generator
+		var yAxis = d3.svg.axis()
+						.scale(yScale)
+						.orient("left")
+						.ticks(5);
+		
+		//Create SVG element
+		var svg = d3.select("body")
+					.append("svg")
+					.attr("width", w)
+					.attr("height", h);
+
+		//Create bars
+		svg.selectAll("rect")
+		   .data(dataset)
+		   .enter()
+		   .append("rect")
+		   .attr("x", function(d, i) {
+		   		//x scale is ordinal, so using the index value for each element
+		   		//here simply moves subsequent bars farther to the right
+		   		return xScale(i);
+		   })
+		   .attr("y", function(d) {
+		   		//y scale is linear, so data value sets the starting point
+		   		//or "top" of the bar
+		   		return yScale(d);
+		   })
+		   .attr("width", xScale.rangeBand())  //All bars have the same width
+		   .attr("height", function(d) {
+		   		//We do some math to get the height or bottom edge of each bar,
+		   		//by subtracting the scaled value (the "top"), from the height
+		   		//of the entire image, minus padding
+		   		return h - padding - yScale(d);
+		   })
+		   .attr("fill", "SteelBlue");
+
+		//Create y axis
+		svg.append("g")
+			.attr("class", "axis")
+			.attr("transform", "translate(" + padding + ",0)")
+			.call(yAxis);
+
+
+
+	</script>
+</body>
+</html>

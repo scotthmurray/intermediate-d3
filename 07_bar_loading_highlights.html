@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>D3: A flexible, scalable bar chart</title>
+	<script type="text/javascript" src="d3.js"></script>
+	<style type="text/css">
+
+
+
+		body {
+			background-color: gray;
+		}
+
+		svg {
+			background-color: white;
+		}
+
+		svg rect {
+			fill: SteelBlue;
+		}
+
+		svg rect.highlight {
+			fill: DarkOrange;
+		}
+
+		.axis path,
+		.axis line {
+			fill: none;
+			stroke: black;
+			shape-rendering: crispEdges;
+		}
+		
+		.axis text {
+			font-family: sans-serif;
+			font-size: 11px;
+		}
+
+
+
+	</style>
+</head>
+<body>
+	<script type="text/javascript">
+
+
+
+		//Width, height, padding
+		var w = 600;
+		var h = 250;
+		var padding = 25;
+		
+		//Array of dummy data values
+		var dataset = [ 5, 10, 13, 19, 21, 25, 22, 18, 15, 13,
+						11, 12, 15, 20, 18, 17, 16, 18, 23, 25 ];
+
+		//Configure x and y scale functions
+		var xScale = d3.scale.ordinal()
+						.domain(d3.range(dataset.length))
+						.rangeRoundBands([ padding, w - padding ], 0.05);
+
+		var yScale = d3.scale.linear()
+						.domain([ 0, d3.max(dataset) ])
+						.rangeRound([ h - padding, padding ]);
+
+		//Configure y axis generator
+		var yAxis = d3.svg.axis()
+						.scale(yScale)
+						.orient("left")
+						.ticks(5);
+		
+		//Create SVG element
+		var svg = d3.select("body")
+					.append("svg")
+					.attr("width", w)
+					.attr("height", h);
+
+		//Create bars
+		//Note: No "highlight" class applied here!
+		var rects = svg.selectAll("rect")
+					   .data(dataset)
+					   .enter()
+					   .append("rect")
+					   .attr("x", function(d, i) {
+					   		return xScale(i);
+					   })
+					   .attr("y", function(d) {
+					   		return h - padding;
+					   })
+					   .attr("width", xScale.rangeBand())
+					   .attr("height", function(d) {
+					   		return 0;
+					   });
+
+		//Transition rects into place
+		rects.transition()
+			.delay(function(d, i) {
+				return i * 100;
+			})
+			.duration(1500)
+			.attr("y", function(d) {
+				return yScale(d);
+			})
+			.attr("height", function(d) {
+				return h - padding - yScale(d);
+			})
+			.each("end", function(d) {
+				//each("end"…) executes on each element, as soon as
+				//the transition is complete.  So here, we wait until
+				//the transition is done, then apply the highlighting logic.
+				d3.select(this)
+				  .classed("highlight", function(d) {
+						if (d > 20) {
+							return true;
+						}
+						return false;
+				  });
+			});
+
+		//Create y axis
+		svg.append("g")
+			.attr("class", "axis")
+			.attr("transform", "translate(" + padding + ",0)")
+			.attr("opacity", 0)
+			.call(yAxis)
+			.transition()
+			.delay(2000)
+			.duration(1500)
+			.attr("opacity", 1.0);
+
+
+
+	</script>
+</body>
+</html>
