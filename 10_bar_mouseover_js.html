@@ -19,12 +19,12 @@
 		/* Commented out, as now we're handling fills with JS */
 		/*
 		svg rect {
-			fill: SteelBlue;
+			fill: steelblue;
 			transition: fill 0.2s ease-in;
 		}
 
 		svg rect.highlight {
-			fill: DarkOrange;
+			fill: darkorange;
 		}
 
 		svg rect:hover {
@@ -98,7 +98,7 @@
 					   .attr("height", function(d) {
 					   		return 0;
 					   })
-					   .attr("fill", "SteelBlue")  //Setting initial fill
+					   .attr("fill", "steelblue")  //Setting initial fill
 					   .on("mouseover", function() {
 					   		//Update fill on mouseover
 					   		d3.select(this)
@@ -109,9 +109,9 @@
 					   		d3.select(this)
 					   			.attr("fill", function(d) {
 									if (d > 20) {
-										return "DarkOrange";
+										return "darkorange";
 									}
-									return "SteelBlue";
+									return "steelblue";
 					   			});
 					   });
 
@@ -127,13 +127,13 @@
 			.attr("height", function(d) {
 				return h - padding - yScale(d);
 			})
-			.transition()
-			.duration(5000)
+			.transition()   //Chained transitions! This begins
+			.duration(500)  //when the initial transition ends.
 			.attr("fill", function(d) {
 				if (d > 20) {
-					return "DarkOrange";
+					return "darkorange";
 				}
-				return "SteelBlue";
+				return "steelblue";
 			});
 
 		//Create y axis
