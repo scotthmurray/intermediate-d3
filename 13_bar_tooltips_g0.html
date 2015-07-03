@@ -16,14 +16,6 @@
 			background-color: white;
 		}
 
-		svg rect {
-			fill: steelblue;
-		}
-
-		svg rect.highlight {
-			fill: darkorange;
-		}
-
 		.axis path,
 		.axis line {
 			fill: none;
@@ -75,25 +67,49 @@
 					.attr("width", w)
 					.attr("height", h);
 
-		//Create bars
-		var rects = svg.selectAll("rect")
-					   .data(dataset)
-					   .enter()
-					   .append("rect")
-					   .classed("highlight", function(d) {
-					   		if (d > 20) {
-					   			return true;
-					   		}
-					   		return false;
-					   })
-					   .attr("x", function(d, i) {
-					   		return xScale(i);
-					   })
-					   .attr("y", function(d) {
-					   		return h - padding;
-					   })
-					   .attr("width", xScale.rangeBand())
-					   .attr("height", 0);
+		//Create groups
+		var groups = svg.selectAll("g")
+						.data(dataset)
+						.enter()
+						.append("g")
+						.attr("class", "bar");
+
+		//Add bar to each group
+		var rects = groups.append("rect")
+						  .attr("x", function(d, i) {
+						  		return xScale(i);
+						  })
+						  .attr("y", function(d) {
+						  		return h - padding;
+						  })
+						  .attr("width", xScale.rangeBand())
+						  .attr("height", 0)
+						  .attr("fill", "steelblue")
+						  .on("mouseover", function() {
+						  		d3.select(this)
+						  			.attr("fill", "maroon");
+						  })
+						  .on("mouseout", function() {
+						  		d3.select(this)
+						  			.attr("fill", function(d) {
+										if (d > 20) {
+											return "darkorange";
+										}
+										return "steelblue";
+						  			});
+						  });
+
+		//Add label to each group
+		groups.append("text")
+			.attr("x", function(d, i) {
+				return xScale(i);
+			})
+			.attr("y", function(d) {
+				return yScale(d);
+			})
+			.text(function(d) {
+				return d;
+			})
 
 		//Transition rects into place
 		rects.transition()
@@ -106,18 +122,25 @@
 			})
 			.attr("height", function(d) {
 				return h - padding - yScale(d);
-			});
+			})
+			.filter(function(d) {
+				if (d > 20) {
+					return true;
+				}
+				return false;
+			})
+			.attr("fill", "darkorange");
 
 		//Create y axis
 		svg.append("g")
 			.attr("class", "axis")
 			.attr("transform", "translate(" + padding + ",0)")
-			.attr("opacity", 0)		//Set initial opacity of this group to zero
+			.attr("opacity", 0)
 			.call(yAxis)
-			.transition()			//Initialize a new transition
-			.delay(2000)			//Set a 2-second delay
-			.duration(1500)			//Set a duration of 1.5 seconds
-			.attr("opacity", 1.0);	//Dial opacity up to 1!
+			.transition()
+			.delay(2000)
+			.duration(1500)
+			.attr("opacity", 1.0);
 
 
 

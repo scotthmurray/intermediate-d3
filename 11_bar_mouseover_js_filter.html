@@ -16,13 +16,21 @@
 			background-color: white;
 		}
 
+		/* Commented out, as now we're handling fills with JS */
+		/*
 		svg rect {
 			fill: steelblue;
+			transition: fill 0.2s ease-in;
 		}
 
 		svg rect.highlight {
 			fill: darkorange;
 		}
+
+		svg rect:hover {
+			fill: maroon;
+		}
+		*/
 
 		.axis path,
 		.axis line {
@@ -80,12 +88,6 @@
 					   .data(dataset)
 					   .enter()
 					   .append("rect")
-					   .classed("highlight", function(d) {
-					   		if (d > 20) {
-					   			return true;
-					   		}
-					   		return false;
-					   })
 					   .attr("x", function(d, i) {
 					   		return xScale(i);
 					   })
@@ -93,7 +95,23 @@
 					   		return h - padding;
 					   })
 					   .attr("width", xScale.rangeBand())
-					   .attr("height", 0);
+					   .attr("height", 0)
+					   .attr("fill", "steelblue")  //Setting initial fill
+					   .on("mouseover", function() {
+					   		//Update fill on mouseover
+					   		d3.select(this)
+					   			.attr("fill", "maroon");
+					   })
+					   .on("mouseout", function() {
+					   		//Update fill on mouseout
+					   		d3.select(this)
+					   			.attr("fill", function(d) {
+									if (d > 20) {
+										return "darkorange";
+									}
+									return "steelblue";
+					   			});
+					   });
 
 		//Transition rects into place
 		rects.transition()
@@ -106,18 +124,27 @@
 			})
 			.attr("height", function(d) {
 				return h - padding - yScale(d);
-			});
+			})
+			.filter(function(d) {	//We can filter a transition selection!
+				if (d > 20) {
+					return true;
+				}
+				return false;
+			})
+			.attr("fill", "darkorange");  //This is part of the same transition
+										  //above, but only applies to elements
+										  //that meet our criteria in the filter.
 
 		//Create y axis
 		svg.append("g")
 			.attr("class", "axis")
 			.attr("transform", "translate(" + padding + ",0)")
-			.attr("opacity", 0)		//Set initial opacity of this group to zero
+			.attr("opacity", 0)
 			.call(yAxis)
-			.transition()			//Initialize a new transition
-			.delay(2000)			//Set a 2-second delay
-			.duration(1500)			//Set a duration of 1.5 seconds
-			.attr("opacity", 1.0);	//Dial opacity up to 1!
+			.transition()
+			.delay(2000)
+			.duration(1500)
+			.attr("opacity", 1.0);
 
 
 

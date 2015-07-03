@@ -29,7 +29,7 @@
 
 		/* New rule gives us easy fill change on mouseover! */
 		svg rect:hover {
-			fill: Maroon;
+			fill: maroon;
 		}
 
 		.axis path,
@@ -95,9 +95,7 @@
 					   		return h - padding;
 					   })
 					   .attr("width", xScale.rangeBand())
-					   .attr("height", function(d) {
-					   		return 0;
-					   });
+					   .attr("height", 0);
 
 		//Transition rects into place
 		rects.transition()

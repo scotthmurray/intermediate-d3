@@ -96,10 +96,7 @@
 					   		return h - padding;
 					   })
 					   .attr("width", xScale.rangeBand())
-					   .attr("height", function(d) {
-					   		//Starting height for rect is zero
-					   		return 0;
-					   });
+					   .attr("height", 0);  //Starting height for all rects is zero
 
 		//We re-select the rects, intiate a transition,
 		//and move their y and height values into place.

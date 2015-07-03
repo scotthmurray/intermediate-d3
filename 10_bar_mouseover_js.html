@@ -28,7 +28,7 @@
 		}
 
 		svg rect:hover {
-			fill: Maroon;
+			fill: maroon;
 		}
 		*/
 
@@ -95,14 +95,12 @@
 					   		return h - padding;
 					   })
 					   .attr("width", xScale.rangeBand())
-					   .attr("height", function(d) {
-					   		return 0;
-					   })
+					   .attr("height", 0)
 					   .attr("fill", "steelblue")  //Setting initial fill
 					   .on("mouseover", function() {
 					   		//Update fill on mouseover
 					   		d3.select(this)
-					   			.attr("fill", "Maroon");
+					   			.attr("fill", "maroon");
 					   })
 					   .on("mouseout", function() {
 					   		//Update fill on mouseout

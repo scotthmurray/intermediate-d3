@@ -90,9 +90,7 @@
 					   		return h - padding;
 					   })
 					   .attr("width", xScale.rangeBand())
-					   .attr("height", function(d) {
-					   		return 0;
-					   });
+					   .attr("height", 0);
 
 		//Transition rects into place
 		rects.transition()
