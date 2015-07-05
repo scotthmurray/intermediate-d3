@@ -88,7 +88,7 @@
 						.on("mouseover", function() {
 
 							d3.select(this).select("rect")
-								.attr("fill", "maroon");
+								.attr("fill", "Maroon");
 
 							//Label opacity
 							d3.select(this).select("text")
@@ -100,9 +100,9 @@
 							d3.select(this).select("rect")
 								.attr("fill", function(d) {
 								if (d > 20) {
-									return "darkorange";
+									return "DarkOrange";
 								}
-								return "steelblue";
+								return "SteelBlue";
 								});
 
 							//Label opacity
@@ -119,7 +119,7 @@
 						  })
 						  .attr("width", xScale.rangeBand())
 						  .attr("height", 0)
-						  .attr("fill", "steelblue");
+						  .attr("fill", "SteelBlue");
 
 		//Add label to each group
 		groups.append("text")
@@ -149,7 +149,7 @@
 				}
 				return false;
 			})
-			.attr("fill", "darkorange");
+			.attr("fill", "DarkOrange");
 
 		//Create y axis
 		svg.append("g")

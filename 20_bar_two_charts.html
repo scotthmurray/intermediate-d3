@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>D3: A flexible, scalable bar chart</title>
+	<script type="text/javascript" src="d3.js"></script>
+	<style type="text/css">
+
+
+
+		body {
+			background-color: gray;
+		}
+
+		#buttonContainer {
+			margin-bottom: 10px;
+		}
+
+		button {
+			padding: 15px;
+		}
+
+		svg {
+			display: block;
+			margin-bottom: 10px;
+			background-color: white;
+		}
+
+		g.bar text {
+			font-family: sans-serif;
+			font-size: 11px;
+			fill: white;
+			font-style: bold;
+			text-anchor: middle;
+			opacity: 0;
+		}
+
+		g.bar.highlight text {
+			opacity: 1;
+		}
+
+		g.bar.highlight rect {
+			fill: Maroon;
+		}
+
+		.axis path,
+		.axis line {
+			fill: none;
+			stroke: black;
+			shape-rendering: crispEdges;
+		}
+		
+		.axis text {
+			font-family: sans-serif;
+			font-size: 11px;
+		}
+
+
+
+	</style>
+</head>
+<body>
+
+	<div id="buttonContainer">
+		<button id="sortBySales">Sort by Sales</button>
+		<button id="sortByBonus">Sort by Bonus</button>
+	</div>
+	
+	<script type="text/javascript">
+
+
+
+		//Width, height, padding
+		var w = 600;
+		var h = 250;
+		var padding = 25;
+		
+		//New sample data, an array of objects!
+		var dataset = [
+						{
+							name:	"Alice",
+							sales:	50,
+							bonus:	5
+						},
+						{
+							name:	"Bob",
+							sales:	40,
+							bonus:	10
+						},
+						{
+							name:	"Carmen",
+							sales:	65,
+							bonus:	15
+						},
+						{
+							name:	"Dan",
+							sales:	55,
+							bonus:	30
+						},
+						{
+							name:	"Esmerelda",
+							sales:	45,
+							bonus:	20
+						},
+						{
+							name:	"Frank",
+							sales:	30,
+							bonus:	5
+						}
+					];
+
+		//Configure x and y scale functions
+		var xScale = d3.scale.ordinal()
+						.domain(d3.range(dataset.length))
+						.rangeRoundBands([ padding, w - padding ], 0.05);
+
+		//Now using two different y scales for two different charts
+		var salesScale = d3.scale.linear()
+						.domain([ 0, d3.max(dataset, function(d) {
+							return d.sales;  //References sales value in d object
+						}) ])
+						.rangeRound([ h - padding, padding ]);
+
+		var bonusScale = d3.scale.linear()
+						.domain([ 0, d3.max(dataset, function(d) {
+							return d.bonus;  //References sales value in d object
+						}) ])
+						.rangeRound([ h - padding, padding ]);
+
+		//Now using two different y axes
+		var salesAxis = d3.svg.axis()
+						.scale(salesScale)
+						.orient("left")
+						.ticks(5);
+	
+		var bonusAxis = d3.svg.axis()
+						.scale(bonusScale)
+						.orient("left")
+						.ticks(5);
+
+
+
+		//
+		// Make the first chart (sales data)
+		//
+
+		//Create SVG element
+		var svg = d3.select("body")
+					.append("svg")
+					.attr("id", "salesChart")
+					.attr("width", w)
+					.attr("height", h);
+
+		//Create groups
+		var groups = svg.selectAll("g")
+						.data(dataset)
+						.enter()
+						.append("g")
+						.attr("class", "bar")
+						.attr("transform", function(d, i) {
+					  		return "translate(" + xScale(i) + ",0)";
+						})
+						.on("mouseover", function() {
+							d3.select(this)
+								.classed("highlight", true);
+						})
+						.on("mouseout", function() {
+							d3.select(this)
+								.classed("highlight", false);
+						});
+
+		//Add bar to each group
+		var rects = groups.append("rect")
+						  .attr("x", 0)
+						  .attr("y", function(d) {
+						  		return h - padding;
+						  })
+						  .attr("width", xScale.rangeBand())
+						  .attr("height", 0)
+						  .attr("fill", "SteelBlue");
+
+		//Add label to each group
+		groups.append("text")
+			.attr("x", xScale.rangeBand() / 2)
+			.attr("y", function(d) {
+				return salesScale(d.sales) + 14;  //References sales value in d object
+			})
+			.text(function(d) {
+				return d.name + ": " + d.sales;  //References values in d object
+			})
+
+		//Transition rects into place
+		rects.transition()
+			.delay(function(d, i) {
+				return i * 100;
+			})
+			.duration(1500)
+			.attr("y", function(d) {
+				return salesScale(d.sales);  //References sales value in d object
+			})
+			.attr("height", function(d) {
+				return h - padding - salesScale(d.sales);  //References sales value in d object
+			});
+
+		//Create y axis
+		svg.append("g")
+			.attr("class", "axis")
+			.attr("transform", "translate(" + padding + ",0)")
+			.attr("opacity", 0)
+			.call(salesAxis)
+			.transition()
+			.delay(2000)
+			.duration(1500)
+			.attr("opacity", 1.0);
+
+
+
+		//
+		// Make the second chart (bonus data)
+		//
+
+		//Create SVG element
+		svg = d3.select("body")
+					.append("svg")
+					.attr("id", "bonusChart")
+					.attr("width", w)
+					.attr("height", h);
+
+		//Create groups
+		groups = svg.selectAll("g")
+						.data(dataset)
+						.enter()
+						.append("g")
+						.attr("class", "bar")
+						.attr("transform", function(d, i) {
+					  		return "translate(" + xScale(i) + ",0)";
+						})
+						.on("mouseover", function() {
+							d3.select(this)
+								.classed("highlight", true);
+						})
+						.on("mouseout", function() {
+							d3.select(this)
+								.classed("highlight", false);
+						});
+
+		//Add bar to each group
+		rects = groups.append("rect")
+						  .attr("x", 0)
+						  .attr("y", function(d) {
+						  		return h - padding;
+						  })
+						  .attr("width", xScale.rangeBand())
+						  .attr("height", 0)
+						  .attr("fill", "SteelBlue");
+
+		//Add label to each group
+		groups.append("text")
+			.attr("x", xScale.rangeBand() / 2)
+			.attr("y", function(d) {
+				return bonusScale(d.bonus) + 14;  //References bonus value in d object
+			})
+			.text(function(d) {
+				return d.name + ": " + d.bonus;  //References values in d object
+			})
+
+		//Transition rects into place
+		rects.transition()
+			.delay(function(d, i) {
+				return i * 100;
+			})
+			.duration(1500)
+			.attr("y", function(d) {
+				return bonusScale(d.bonus);  //References bonus value in d object
+			})
+			.attr("height", function(d) {
+				return h - padding - bonusScale(d.bonus);  //References bonus value in d object
+			});
+
+		//Create y axis
+		svg.append("g")
+			.attr("class", "axis")
+			.attr("transform", "translate(" + padding + ",0)")
+			.attr("opacity", 0)
+			.call(bonusAxis)
+			.transition()
+			.delay(2000)
+			.duration(1500)
+			.attr("opacity", 1.0);
+
+
+
+		//Sorting logic
+		d3.select("#sortBySales")
+			.on("click", function() {
+
+				//Need to reselect all groups in each chart
+				d3.selectAll("#salesChart g.bar").sort(function(a, b) {
+  						return d3.ascending(a.sales, b.sales);
+					})
+					.transition()
+					.delay(function(d, i) {
+						return i * 50;
+					})
+					.duration(1000)
+					.attr("transform", function(d, i) {
+				  		return "translate(" + xScale(i) + ",0)";
+					});
+
+				d3.selectAll("#bonusChart g.bar").sort(function(a, b) {
+  						return d3.ascending(a.sales, b.sales);
+					})
+					.transition()
+					.delay(function(d, i) {
+						return i * 50;
+					})
+					.duration(1000)
+					.attr("transform", function(d, i) {
+				  		return "translate(" + xScale(i) + ",0)";
+					});
+
+			});
+
+		d3.select("#sortByBonus")  //DEscending
+			.on("click", function() {
+
+				//Need to reselect all groups in each chart
+				d3.selectAll("#salesChart g.bar").sort(function(a, b) {
+  						return d3.ascending(a.bonus, b.bonus);
+					})
+					.transition()
+					.delay(function(d, i) {
+						return i * 50;
+					})
+					.duration(1000)
+					.attr("transform", function(d, i) {
+				  		return "translate(" + xScale(i) + ",0)";
+					});
+
+				d3.selectAll("#bonusChart g.bar").sort(function(a, b) {
+  						return d3.ascending(a.bonus, b.bonus);
+					})
+					.transition()
+					.delay(function(d, i) {
+						return i * 50;
+					})
+					.duration(1000)
+					.attr("transform", function(d, i) {
+				  		return "translate(" + xScale(i) + ",0)";
+					});
+
+			});
+
+
+
+	</script>
+</body>
+</html>

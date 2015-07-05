@@ -84,18 +84,18 @@
 						  })
 						  .attr("width", xScale.rangeBand())
 						  .attr("height", 0)
-						  .attr("fill", "steelblue")
+						  .attr("fill", "SteelBlue")
 						  .on("mouseover", function() {
 						  		d3.select(this)
-						  			.attr("fill", "maroon");
+						  			.attr("fill", "Maroon");
 						  })
 						  .on("mouseout", function() {
 						  		d3.select(this)
 						  			.attr("fill", function(d) {
 										if (d > 20) {
-											return "darkorange";
+											return "DarkOrange";
 										}
-										return "steelblue";
+										return "SteelBlue";
 						  			});
 						  });
 
@@ -129,7 +129,7 @@
 				}
 				return false;
 			})
-			.attr("fill", "darkorange");
+			.attr("fill", "DarkOrange");
 
 		//Create y axis
 		svg.append("g")

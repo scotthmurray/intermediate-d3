@@ -12,8 +12,34 @@
 			background-color: gray;
 		}
 
+		/* New rules for styling buttons */
+		#buttonContainer {
+			margin-bottom: 10px;
+		}
+
+		button {
+			padding: 15px;
+		}
+
 		svg {
 			background-color: white;
+		}
+
+		g.bar text {
+			font-family: sans-serif;
+			font-size: 11px;
+			fill: white;
+			font-style: bold;
+			text-anchor: middle;
+			opacity: 0;
+		}
+
+		g.bar.highlight text {
+			opacity: 1;
+		}
+
+		g.bar.highlight rect {
+			fill: Maroon;
 		}
 
 		.axis path,
@@ -33,6 +59,12 @@
 	</style>
 </head>
 <body>
+
+	<!-- New buttons to trigger sorting! -->
+	<div id="buttonContainer">
+		<button id="sortAscending">Sort Ascending</button>
+	</div>
+
 	<script type="text/javascript">
 
 
@@ -67,36 +99,40 @@
 					.attr("width", w)
 					.attr("height", h);
 
-		//Create bars
-		var rects = svg.selectAll("rect")
-					   .data(dataset)
-					   .enter()
-					   .append("rect")
-					   .attr("x", function(d, i) {
-					   		return xScale(i);
-					   })
-					   .attr("y", function(d) {
-					   		return h - padding;
-					   })
-					   .attr("width", xScale.rangeBand())
-					   .attr("height", 0)
-					   .attr("fill", "SteelBlue")
-					   .on("mouseover", function() {
-					   		d3.select(this)
-					   			.attr("fill", "Maroon");
-					   })
-					   .on("mouseout", function() {
-					   		d3.select(this)
-					   			.attr("fill", function(d) {
-									if (d > 20) {
-										return "DarkOrange";
-									}
-									return "SteelBlue";
-					   			});
-					   });
+		//Create groups
+		var groups = svg.selectAll("g")
+						.data(dataset)
+						.enter()
+						.append("g")
+						.attr("class", "bar")
+						.attr("transform", function(d, i) {
+					  		return "translate(" + xScale(i) + ",0)";
+						})
+						.on("mouseover", function() {
+							d3.select(this)
+								.classed("highlight", true);
+						})
+						.on("mouseout", function() {
+							d3.select(this)
+								.classed("highlight", false);
+						});
 
-		//Add tooltip to each rect
-		rects.append("title")
+		//Add bar to each group
+		var rects = groups.append("rect")
+						  .attr("x", 0)
+						  .attr("y", function(d) {
+						  		return h - padding;
+						  })
+						  .attr("width", xScale.rangeBand())
+						  .attr("height", 0)
+						  .attr("fill", "SteelBlue");
+
+		//Add label to each group
+		groups.append("text")
+			.attr("x", xScale.rangeBand() / 2)
+			.attr("y", function(d) {
+				return yScale(d) + 14;
+			})
 			.text(function(d) {
 				return d;
 			})
@@ -131,6 +167,24 @@
 			.delay(2000)
 			.duration(1500)
 			.attr("opacity", 1.0);
+
+		//Sorting logic
+		d3.select("#sortAscending")
+			.on("click", function() {
+
+				groups.sort(function(a, b) {
+  						return d3.ascending(a, b);
+					})
+					.transition()
+					.delay(function(d, i) {
+						return i * 50;
+					})
+					.duration(1000)
+					.attr("transform", function(d, i) {
+				  		return "translate(" + xScale(i) + ",0)";
+					});
+
+			});
 
 
 

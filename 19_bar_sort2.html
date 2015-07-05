@@ -12,6 +12,15 @@
 			background-color: gray;
 		}
 
+		/* New rules for styling buttons */
+		#buttonContainer {
+			margin-bottom: 10px;
+		}
+
+		button {
+			padding: 15px;
+		}
+
 		svg {
 			background-color: white;
 		}
@@ -25,12 +34,9 @@
 			opacity: 0;
 		}
 
-		/* Commented out, now that we have a <div> tooltip */
-		/*
 		g.bar.highlight text {
 			opacity: 1;
 		}
-		*/
 
 		g.bar.highlight rect {
 			fill: Maroon;
@@ -48,34 +54,16 @@
 			font-size: 11px;
 		}
 
-		/* Styling for new <div> */
-		#tooltip {
-			position: absolute;
-			top: 0;
-			left: 0;
-			z-index: 10;
-			margin: 0;
-			padding: 10px;
-			width: 15px;
-			height: 12px;
-			color: white;
-			font-family: sans-serif;
-			font-size: 12px;
-			font-weight: bold;
-			text-align: center;
-			background-color: rgba(0, 0, 0, 0.75);
-			opacity: 0;
-			pointer-events: none;
-		}
-
 
 
 	</style>
 </head>
 <body>
 
-	<!-- New HTML div functions as our tooltip -->
-	<div id="tooltip">
+	<!-- New buttons to trigger sorting! -->
+	<div id="buttonContainer">
+		<button id="sortAscending">Sort Ascending</button>
+		<button id="sortDescending">Sort Descending</button>
 	</div>
 
 	<script type="text/javascript">
@@ -121,36 +109,13 @@
 						.attr("transform", function(d, i) {
 					  		return "translate(" + xScale(i) + ",0)";
 						})
-						.on("mouseover", function(d) {
-
+						.on("mouseover", function() {
 							d3.select(this)
 								.classed("highlight", true);
-
-							//Position the tooltip <div> and set its content
-							var x = d3.event.pageX;
-							var y = d3.event.pageY - 40;
-
-							d3.select("#tooltip")
-								.style("left", x + "px")
-								.style("top", y + "px")
-								.style("opacity", 1)
-								.text(d);
-								//Note: No need for an anonymous function here,
-								//e.g. function(d) {…}, because the data value
-								//'d' we want here belongs to the <g> element
-								//on which mouseover was triggered, not the
-								//tooltip div (which has no data bound to it).
-
 						})
 						.on("mouseout", function() {
-
 							d3.select(this)
 								.classed("highlight", false);
-
-							//Hide the tooltip
-							d3.select("#tooltip")
-								.style("opacity", 0);
-
 						});
 
 		//Add bar to each group
@@ -203,6 +168,42 @@
 			.delay(2000)
 			.duration(1500)
 			.attr("opacity", 1.0);
+
+		//Sorting logic
+		d3.select("#sortAscending")
+			.on("click", function() {
+
+				groups.sort(function(a, b) {
+  						return d3.ascending(a, b);
+					})
+					.transition()
+					.delay(function(d, i) {
+						return i * 50;
+					})
+					.duration(1000)
+					.attr("transform", function(d, i) {
+				  		return "translate(" + xScale(i) + ",0)";
+					});
+
+			});
+
+		//This is EXACTLY the same as above, except for:
+		d3.select("#sortDescending")  //DEscending
+			.on("click", function() {
+
+				groups.sort(function(a, b) {
+  						return d3.descending(a, b);  //DEscending
+					})
+					.transition()
+					.delay(function(d, i) {
+						return i * 50;
+					})
+					.duration(1000)
+					.attr("transform", function(d, i) {
+				  		return "translate(" + xScale(i) + ",0)";
+					});
+
+			});
 
 
 
