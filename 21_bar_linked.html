@@ -62,8 +62,7 @@
 <body>
 
 	<div id="buttonContainer">
-		<button id="sortBySales">Sort by Sales</button>
-		<button id="sortByBonus">Sort by Bonus</button>
+		<button id="sort">Sort</button>
 	</div>
 	
 	<script type="text/javascript">
@@ -319,42 +318,12 @@
 
 
 		//Sorting logic
-		d3.select("#sortBySales")
+		d3.select("#sort")
 			.on("click", function() {
 
 				//Need to reselect all groups in each chart
 				d3.selectAll("#salesChart g.bar").sort(function(a, b) {
   						return d3.ascending(a.sales, b.sales);
-					})
-					.transition()
-					.delay(function(d, i) {
-						return i * 50;
-					})
-					.duration(1000)
-					.attr("transform", function(d, i) {
-				  		return "translate(" + xScale(i) + ",0)";
-					});
-
-				d3.selectAll("#bonusChart g.bar").sort(function(a, b) {
-  						return d3.ascending(a.sales, b.sales);
-					})
-					.transition()
-					.delay(function(d, i) {
-						return i * 50;
-					})
-					.duration(1000)
-					.attr("transform", function(d, i) {
-				  		return "translate(" + xScale(i) + ",0)";
-					});
-
-			});
-
-		d3.select("#sortByBonus")  //DEscending
-			.on("click", function() {
-
-				//Need to reselect all groups in each chart
-				d3.selectAll("#salesChart g.bar").sort(function(a, b) {
-  						return d3.ascending(a.bonus, b.bonus);
 					})
 					.transition()
 					.delay(function(d, i) {
