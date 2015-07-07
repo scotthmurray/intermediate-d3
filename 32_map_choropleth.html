@@ -39,6 +39,11 @@
 		var path = d3.geo.path()
 						 .projection(projection);
 
+		//Define quantize scale to sort data values into buckets of color
+		//Colors by Cynthia Brewer (colorbrewer2.org), YlOrRd
+		var color = d3.scale.quantize()
+							.range([ "#ffffb2", "#fecc5c", "#fd8d3c", "#f03b20", "#bd0026" ]);
+
 		//Create SVG
 		var svg = d3.select("body")
 					.append("svg")
