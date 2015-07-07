@@ -114,7 +114,26 @@
 						}
 
 					});
-		
+
+				//Load in cities data
+				d3.csv("data/cities/cities.csv", function(data) {
+					
+					svg.selectAll("circle")
+					   .data(data)
+					   .enter()
+					   .append("circle")
+					   .attr("cx", function(d) {
+						   return projection([d.longitude, d.latitude])[0];
+					   })
+					   .attr("cy", function(d) {
+						   return projection([d.longitude, d.latitude])[1];
+					   })
+					   .attr("r", 5)
+					   .style("fill", "blue")
+					   .style("opacity", 0.75);
+					
+				});
+
 			});  //End d3.json()
 
 		});  //End d3.csv()
