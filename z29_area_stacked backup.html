@@ -115,7 +115,7 @@
 		//
 		//This happens asynchronously; callback function fires when done
 		//
-		d3.csv("data/g7_co2_emissions.csv", function(data) {
+		d3.csv("data/co2/g7_co2_emissions.csv", function(data) {
 
 			//Uncomment to log the newly loaded data to the console
 			//console.log(data);
@@ -257,7 +257,7 @@
 			//Areas
 			//
 			//Now that we are creating multiple paths, we can use the
-			//selectAll/data/enter/append pattern to generate as many
+			//selectAll/data/co2/enter/append pattern to generate as many
 			//as needed.
 			//
 			//Note that we create a <g> group for each *first*,
