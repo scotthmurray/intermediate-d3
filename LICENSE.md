@@ -2,6 +2,10 @@
 
 This work is licensed under a [Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License](http://creativecommons.org/licenses/by-nc-nd/3.0/).
 
+## DATA LICENSES
+
+See folders inside /data/ for licenses for each data set.
+
 ## D3.JS LICENSE
 
 Copyright (c) 2010-2015, Michael Bostock
