@@ -103,7 +103,7 @@
 				return yScale(d.y0);  //Updated
 			})
 			.y1(function(d) {
-				return yScale(d.y);  //Updated
+				return yScale(d.y0 + d.y);  //Updated
 			});
 
 		//Easy colors accessible via a 10-step ordinal scale
@@ -214,7 +214,7 @@
 			//console.log(data);
 
 			//Uncomment to log the newly restructured dataset to the console
-			console.log(dataset);
+			//console.log(dataset);
 
 
 

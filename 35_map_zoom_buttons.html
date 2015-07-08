@@ -60,30 +60,7 @@
 		var zoom = d3.behavior.zoom()
 			.translate( projection.translate() )
 			.scale( projection.scale() )
-			.scaleExtent([ maxZoomOut, maxZoomIn ])
-			.on("zoom", function(d) {
-
-				//xxx
-				console.log("zoom event triggered");
-
-				var t = d3.event.translate;
-				var s = d3.event.scale;
-				
-				zoom.translate(t);
-				projection.translate(t).scale(s);
-				
-				countries.attr("d", path);
-
-				cities.attr("cx", function(d) {
-						   return projection([d.longitude, d.latitude])[0];
-					   })
-					   .attr("cy", function(d) {
-						   return projection([d.longitude, d.latitude])[1];
-					   })
-					   .attr("r", function(d) {
-						   return Math.sqrt(+d.population / w * 0.001);
-					   });
-			});
+			.scaleExtent([ maxZoomOut, maxZoomIn ]);
 
 		//Define zoom in and out functions that we can call easily later
 		var zoomIn = function() {
@@ -117,7 +94,7 @@
 
 			countries.transition()
 				.ease("linear")
-				.delay(30)
+				.delay(50)
 				.duration(500)
 				.attr("d", path);
 
@@ -219,8 +196,7 @@
 							return "#ccc";
 						}
 
-					})
-					.call(zoom);  //xxx
+					});
 
 				//Load in cities data
 				d3.csv("data/cities/cities.csv", function(data) {

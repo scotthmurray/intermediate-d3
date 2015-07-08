@@ -21,9 +21,18 @@
 	</style>
 </head>
 <body>
+
+	<div id="mapContainer"></div>
+	<button id="zoomIn">Zoom In</button>
+	<button id="zoomOut">Zoom Out</button>
+
 	<script type="text/javascript">
 
 
+
+		//Globals for use later
+		var countries;
+		var cities;
 
 		//Year of CO2 data to map
 		var year = "2010";
@@ -42,13 +51,111 @@
 		var path = d3.geo.path()
 						 .projection(projection);
 
+		//
+		//Configure zoom behavior
+		//
+		var maxZoomIn = w*2;
+		var maxZoomOut = w/7;
+
+		var zoom = d3.behavior.zoom()
+			.translate( projection.translate() )
+			.scale( projection.scale() )
+			.scaleExtent([ maxZoomOut, maxZoomIn ])
+			//Defines the on("zoom") event!  That is, what
+			//to do on double-click or mousewheel roll.
+			.on("zoom", function(d) {
+
+				//Get the translate and scale values from this event
+				var t = d3.event.translate;
+				var s = d3.event.scale;
+				
+				//Update the zoom and projection objects with these
+				zoom.translate(t);
+				projection.translate(t).scale(s);
+				
+				//Recalculate paths (given new t and s values)
+				countries.attr("d", path);
+
+				//Recalculate cities (same idea)
+				cities.attr("cx", function(d) {
+						   return projection([d.longitude, d.latitude])[0];
+					   })
+					   .attr("cy", function(d) {
+						   return projection([d.longitude, d.latitude])[1];
+					   });
+					   
+			});
+
+		//Define zoom in and out functions that we can call easily later
+		var zoomIn = function() {
+			var newScale = Math.min(projection.scale() * 2, maxZoomIn);
+			zoomTo(newScale);
+		};
+
+		var zoomOut = function() {
+			var newScale = Math.max(projection.scale() / 2, maxZoomOut);
+			zoomTo(newScale);
+		};
+
+		//Define zoomTo function to which we can pass a new scale value
+		zoomTo = function(newScale) {
+
+			var t = projection.translate(),
+				s = projection.scale();
+			
+			t[0] -= w / 2;
+			t[0] *= newScale / s;
+			t[0] += w / 2;
+
+			t[1] -= h * 0.55;
+			t[1] *= newScale / s;
+			t[1] += h * 0.55;
+			
+			zoom.translate(t).scale(newScale);
+			projection.translate(t).scale(newScale);
+
+			//Finally, transition paths and circles into place
+
+			countries.transition()
+				.ease("linear")
+				.delay(50)
+				.duration(500)
+				.attr("d", path);
+
+			cities.transition()
+				.ease("linear")
+				.duration(500)
+				.attr("cx", function(d) {
+					return projection([d.longitude, d.latitude])[0];
+				})
+				.attr("cy", function(d) {
+					return projection([d.longitude, d.latitude])[1];
+				});
+
+		};
+
+		//Assign zoom button behavior
+		d3.select("#zoomIn")
+			.on("click", function() {
+				zoomIn();
+			});
+
+		d3.select("#zoomOut")
+			.on("click", function() {
+				zoomOut();
+			});
+
+
+
+
+
 		//Define quantize scale to sort data values into buckets of color
 		//Colors by Cynthia Brewer (colorbrewer2.org), YlOrRd
 		var color = d3.scale.quantize()
 							.range([ "#ffffb2", "#fecc5c", "#fd8d3c", "#f03b20", "#bd0026" ]);
 
 		//Create SVG
-		var svg = d3.select("body")
+		var svg = d3.select("#mapContainer")
 					.append("svg")
 					.attr("width", w)
 					.attr("height", h);
@@ -94,8 +201,24 @@
 					}		
 				}
 
+				//Create a group to contain all the country paths.
+				//This is primarily to catch zoom events, even when
+				//the mouse is positioned over the ocean.
+				var countriesGroup = svg.append("g")
+										.attr("id", "countriesGroup")
+										.call(zoom);  //Bind zoom listener to the countries group
+
+				//Create a rectangle in the background.
+				//This is purely to ensure this group fills the whole
+				//SVG image, so mousewheel events are caught.
+				countriesGroup.append("rect")
+					.attr("x", 0)
+					.attr("y", 0)
+					.attr("width", w)
+					.attr("height", h);
+
 				//Bind data and create one path per GeoJSON feature
-				svg.selectAll("path")
+				countries = countriesGroup.selectAll("path")
 				   .data(json.features)
 				   .enter()
 				   .append("path")
@@ -118,8 +241,7 @@
 				//Load in cities data
 				d3.csv("data/cities/cities.csv", function(data) {
 					
-					//Create a circle for each city
-					svg.selectAll("circle")
+					cities = svg.selectAll("circle")
 					   .data(data)
 					   .enter()
 					   .append("circle")
@@ -130,7 +252,6 @@
 						   return projection([d.longitude, d.latitude])[1];
 					   })
 					   .attr("r", function(d) {
-					   	   //Use Math.sqrt to scale by area (not radius)
 						   return Math.sqrt(+d.population / w * 0.001);
 					   })
 					   .style("fill", "blue")
