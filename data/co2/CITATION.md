@@ -8,14 +8,11 @@ The contents of individual CSVs have been modified slightly, for formatting purp
 
 The files contain:
 
-co2_emissions.csv
-CO2 emissions values by year for all countries
+**co2_emissions.csv** — CO2 emissions values by year for all countries
 
-g7_co2_emissions.csv
-CO2 emissions values by year for current G7 countries
+**g7_co2_emissions.csv** — CO2 emissions values by year for current G7 countries
 
-usa_co2_emissions.csv
-CO2 emissions values by year for the USA only
+**usa_co2_emissions.csv** — CO2 emissions values by year for the USA only
 
 
 
