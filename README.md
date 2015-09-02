@@ -1,6 +1,6 @@
 # intermediate-d3
 
-These code examples accompany the O’Reilly video course “Intermediate d3.js: Charts, Layouts, and Maps”.
+These code examples accompany the O’Reilly video course “[Intermediate d3.js: Charts, Layouts, and Maps](http://shop.oreilly.com/product/0636920040101.do)”.
 
 This video is preceded by the introductory video course “[An Introduction to d3.js: From Scattered to Scatterplot](http://shop.oreilly.com/product/110000632.do)”.  I recommend watching and working through that course before attempting this one.
 
